@@ -255,10 +255,10 @@ onMounted(() => {
           <div class="p-5 sm:p-6 rounded-3xl bg-slate-900/40 border border-white/10 backdrop-blur-2xl shadow-xl space-y-5 box-border">
             
             <div class="flex items-center justify-between pb-4 border-b border-white/5">
-              <div class="flex items-center gap-2">
-                <Gauge class="w-4 h-4 text-cyan-400" />
-                <h2 class="text-xs font-semibold tracking-wider uppercase text-slate-300">Kontrol Parameter Perilaku</h2>
-              </div>
+              <div class="flex items-center gap-2.5">
+                  <Gauge class="w-4.5 h-4.5 text-cyan-400" />
+                  <h2 class="text-sm font-bold tracking-wider uppercase text-slate-200">Kontrol Parameter Perilaku</h2>
+                </div>
               <span class="text-[11px] font-mono text-slate-400 bg-white/5 px-2.5 py-1 rounded-full border border-white/5 shrink-0">
                 5 Actionable Inputs
               </span>
@@ -272,7 +272,7 @@ onMounted(() => {
                 class="group p-4 rounded-2xl bg-slate-950/50 border border-white/5 hover:border-cyan-500/30 transition-all duration-300 space-y-3 box-border"
               >
                 <div class="flex items-center justify-between text-xs">
-                  <span class="font-medium text-slate-200 group-hover:text-cyan-300 transition-colors">
+                  <span class="text-sm font-semibold text-slate-100 group-hover:text-cyan-300 transition-colors">
                     {{ s.label }}
                   </span>
                   <div class="flex items-baseline gap-1 font-mono shrink-0">
@@ -296,7 +296,7 @@ onMounted(() => {
                   />
                 </div>
 
-                <p class="text-[11px] text-slate-400 leading-relaxed">
+                <p class="text-xs sm:text-[12px] text-slate-300 leading-relaxed">
                   {{ s.desc }}
                 </p>
               </div>
@@ -323,9 +323,9 @@ onMounted(() => {
             </div>
 
             <!-- Big Metric Value -->
-            <div class="flex items-baseline gap-3 my-3">
-              <span :class="['text-5xl sm:text-6xl font-black font-mono tracking-tighter bg-gradient-to-br bg-clip-text text-transparent', riskTheme.gradientText]">
-                {{ riskData.risk_percentage }}%
+            <div class="flex items-baseline gap-2.5 my-2">
+              <span :class="['text-4xl sm:text-5xl font-extrabold font-mono tracking-normal leading-normal py-1 inline-block bg-gradient-to-br bg-clip-text text-transparent', riskTheme.gradientText]">
+                    {{ riskData.risk_percentage }}%
               </span>
               <span class="text-xs font-medium text-slate-400 uppercase tracking-widest">Calculated Risk</span>
             </div>
