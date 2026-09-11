@@ -156,6 +156,79 @@ const sliders = [
   { key: 'average_speed', label: 'Operational Cruising Speed', unit: 'km/h', min: 20, max: 120, step: 1, desc: 'Kecepatan rerata berkendara yang mempengaruhi laju pengosongan daya' }
 ]
 
+// Komputasi Titik Poligon Radar Chart (Current Profile vs Recommended Profile)
+const radarData = computed(() => {
+  if (!optimization.value) return null
+  const cx = 130
+  const cy = 100
+  const rMax = 62
+  const total = sliders.length
+
+  const optMap = {}
+  optimization.value.recommendations.forEach(item => {
+    optMap[item.feature] = item.recommended_value
+  })
+
+  const calcPoint = (val, min, max, index, customRadius = null) => {
+    const norm = customRadius !== null ? customRadius : Math.max(0.12, Math.min(1, (val - min) / (max - min)))
+    const radius = customRadius !== null ? customRadius : rMax * norm
+    const angle = (Math.PI * 2 / total) * index - Math.PI / 2
+    return {
+      x: cx + radius * Math.cos(angle),
+      y: cy + radius * Math.sin(angle)
+    }
+  }
+
+  const currentPoints = sliders.map((s, i) => calcPoint(form[s.key], s.min, s.max, i))
+  const optimalPoints = sliders.map((s, i) => {
+    const val = optMap[s.key] !== undefined ? optMap[s.key] : form[s.key]
+    return calcPoint(val, s.min, s.max, i)
+  })
+
+  const currentPolygon = currentPoints.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')
+  const optimalPolygon = optimalPoints.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')
+
+  const gridLevels = [0.35, 0.7, 1.0].map(lvl => {
+    return sliders.map((_, i) => {
+      const p = calcPoint(0, 0, 1, i, rMax * lvl)
+      return `${p.x.toFixed(1)},${p.y.toFixed(1)}`
+    }).join(' ')
+  })
+
+  const axes = sliders.map((_, i) => {
+    const angle = (Math.PI * 2 / total) * i - Math.PI / 2
+    return {
+      x2: (cx + rMax * Math.cos(angle)).toFixed(1),
+      y2: (cy + rMax * Math.sin(angle)).toFixed(1)
+    }
+  })
+
+  const shortLabels = ['DoD', 'SoC', 'Fast Chg', 'Braking', 'Speed']
+  const labelPositions = sliders.map((_, i) => {
+    const angle = (Math.PI * 2 / total) * i - Math.PI / 2
+    const labelRadius = rMax + 16
+    let anchor = 'middle'
+    if (i === 1 || i === 2) anchor = 'start'
+    if (i === 3 || i === 4) anchor = 'end'
+    return {
+      text: shortLabels[i],
+      x: (cx + labelRadius * Math.cos(angle)).toFixed(1),
+      y: (cy + labelRadius * Math.sin(angle) + 3).toFixed(1),
+      anchor
+    }
+  })
+
+  return {
+    cx,
+    cy,
+    currentPolygon,
+    optimalPolygon,
+    gridLevels,
+    axes,
+    labelPositions
+  }
+})
+
 onMounted(() => {
   calculateRisk()
 })
@@ -374,38 +447,120 @@ onMounted(() => {
               </div>
             </div>
 
-            <!-- Recommendation Changes -->
-            <div class="space-y-2">
-              <div 
-                v-for="rec in optimization.recommendations" 
-                :key="rec.feature"
-                class="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/40 border border-white/5 text-xs hover:border-white/10 transition-colors box-border"
-              >
-                <span class="text-slate-300 font-medium truncate pr-2">
-                  {{ sliders.find(s => s.key === rec.feature)?.label.split('(')[0] || rec.feature }}
-                </span>
-                
-                <div class="flex items-center gap-2 font-mono shrink-0">
-                  <span class="text-slate-500 line-through">{{ rec.current_value }}</span>
-                  <span class="text-slate-600">→</span>
-                  <span class="text-cyan-300 font-bold">{{ rec.recommended_value }}</span>
-                  
-                  <span 
-                    :class="[
-                      'text-[10px] px-2 py-0.5 rounded-md font-sans font-medium flex items-center gap-0.5 shrink-0',
-                      rec.delta < 0 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 
-                      rec.delta > 0 ? 'bg-cyan-500/10 text-cyan-300 border border-cyan-500/20' : 
-                      'bg-slate-800 text-slate-400'
-                    ]"
-                  >
-                    <ArrowDownRight v-if="rec.delta < 0" class="w-3 h-3" />
-                    <ArrowUpRight v-else-if="rec.delta > 0" class="w-3 h-3" />
-                    {{ rec.action }}
+            <!-- Radar Chart: Current Habit vs Optimal Habit -->
+            <div v-if="radarData" class="p-3.5 rounded-2xl bg-slate-950/70 border border-white/5 space-y-2.5 box-border">
+              <div class="flex items-center justify-between text-[11px]">
+                <Polygon class="text-xs sm:text-sm font-semibold text-slate-100"></Polygon Komparasi Parameter</span>
+                <div class="flex items-center gap-3">
+                  <span class="flex items-center gap-1.5 text-cyan-300 font-mono text-[10px]">
+                    <span class="w-2 h-2 rounded-full bg-cyan-400" />
+                    Saat Ini
+                  </span>
+                  <span class="flex items-center gap-1.5 text-emerald-300 font-mono text-[10px]">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400" />
+                    Optimal
                   </span>
                 </div>
               </div>
+
+              <div class="w-full flex justify-center py-1">
+                <svg viewBox="0 0 260 200" class="w-full max-w-[280px] h-auto overflow-visible select-none">
+                  <!-- Web Ring Grids -->
+                  <polygon 
+                    v-for="(ring, idx) in radarData.gridLevels" 
+                    :key="'ring-' + idx"
+                    :points="ring"
+                    fill="none"
+                    stroke="#334155"
+                    stroke-width="1"
+                    stroke-dasharray="3,3"
+                    opacity="0.6"
+                  />
+
+                  <!-- Axis Rays -->
+                  <line 
+                    v-for="(axis, idx) in radarData.axes" 
+                    :key="'axis-' + idx"
+                    :x1="radarData.cx"
+                    :y1="radarData.cy"
+                    :x2="axis.x2"
+                    :y2="axis.y2"
+                    stroke="#1e293b"
+                    stroke-width="1.2"
+                  />
+
+                  <!-- Current Profile Polygon (Cyan) -->
+                  <polygon 
+                    :points="radarData.currentPolygon"
+                    fill="rgba(34, 211, 238, 0.2)"
+                    stroke="#22d3ee"
+                    stroke-width="1.8"
+                    class="transition-all duration-300"
+                  />
+
+                  <!-- Optimal Profile Polygon (Emerald) -->
+                  <polygon 
+                    :points="radarData.optimalPolygon"
+                    fill="rgba(16, 185, 129, 0.25)"
+                    stroke="#10b981"
+                    stroke-width="2"
+                    class="transition-all duration-300"
+                  />
+
+                  <!-- Text Labels for 5 Features -->
+                  <text 
+                    v-for="(lbl, idx) in radarData.labelPositions" 
+                    :key="'lbl-' + idx"
+                    :x="lbl.x" 
+                    :y="lbl.y" 
+                    :text-anchor="lbl.anchor"
+                    fill="#94a3b8" 
+                    font-size="4.5" 
+                    font-family="monospace"
+                    font-weight="300"
+                  >
+                    {{ lbl.text }}
+                  </text>
+                </svg>
+              </div>
             </div>
 
+            <!-- Recommendation Changes -->
+            
+<div class="space-y-2.5">
+  <div 
+    v-for="rec in optimization.recommendations" 
+    :key="rec.feature"
+    class="flex items-center justify-between p-3 rounded-xl bg-slate-950/40 border border-white/5 hover:border-white/10 transition-colors box-border"
+  >
+    <!-- Label Nama Parameter (Dinaikkan ke text-sm & font-semibold) -->
+    <span class="text-sm font-semibold text-slate-100 truncate pr-2">
+      {{ sliders.find(s => s.key === rec.feature)?.label.split('(')[0] || rec.feature }}
+    </span>
+    
+    <div class="flex items-center gap-2.5 font-mono shrink-0">
+      <!-- Nilai Lama -->
+      <span class="text-xs sm:text-sm text-slate-400 line-through">{{ rec.current_value }}</span>
+      <span class="text-slate-500 text-xs">→</span>
+      <!-- Nilai Rekomendasi Baru (Dinaikkan ke text-sm sm:text-base) -->
+      <span class="text-sm sm:text-base text-cyan-300 font-bold">{{ rec.recommended_value }}</span>
+      
+      <!-- Badge Aksi Turunkan / Pertahankan (Dinaikkan ke text-xs) -->
+      <span 
+        :class="[
+          'text-xs px-2.5 py-1 rounded-md font-sans font-medium flex items-center gap-1 shrink-0',
+          rec.delta < 0 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 
+          rec.delta > 0 ? 'bg-cyan-500/10 text-cyan-300 border border-cyan-500/20' : 
+          'bg-slate-800 text-slate-400'
+        ]"
+      >
+        <ArrowDownRight v-if="rec.delta < 0" class="w-3.5 h-3.5" />
+        <ArrowUpRight v-else-if="rec.delta > 0" class="w-3.5 h-3.5" />
+        {{ rec.action }}
+      </span>
+    </div>
+  </div>
+</div>
             <!-- Apply Button -->
             <button 
               @click="applyRecommendation"
