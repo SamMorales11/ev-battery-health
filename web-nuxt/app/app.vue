@@ -17,6 +17,14 @@ import {
 
 useHead({
   title: 'VoltIQ - EV Battery Health Simulator',
+  link: [
+    // Opsi SVG Data URI instan (Ikon Petir Voltase Cyan langsung tampil tanpa perlu download file):
+    {
+      rel: 'icon',
+      type: 'image/svg+xml',
+      href: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2322d3ee"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>'
+    }
+  ],
   htmlAttrs: {
     class: 'bg-[#070b14] overflow-x-hidden'
   },
@@ -256,8 +264,8 @@ onMounted(() => {
             <Zap class="w-5 h-5" />
           </div>
           <div class="min-w-0">
-            <div class="flex flex-wrap items-center gap-2">
-              <h1 class="text-lg font-bold tracking-tight text-white truncate">VoltIQ Telemetry</h1>
+            <div class="flex flex-wrap items-center gap-2.5">
+              <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-white truncate">VoltIQ Telemetry</h1>
               <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide bg-cyan-950/80 border border-cyan-500/30 text-cyan-300 shrink-0">
                 <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
                 LIGHTGBM OP-CORE
