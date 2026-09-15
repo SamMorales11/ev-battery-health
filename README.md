@@ -7,6 +7,7 @@
 [![LightGBM](https://img.shields.io/badge/Model-LightGBM-brightgreen?logo=scikitlearn&logoColor=white)](https://lightgbm.readthedocs.io/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.x-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 Predictive EV Battery Degradation & Telemetry Intelligence
 VoltIQ is a machine-learning-powered battery telemetry simulator designed to analyze electric vehicle (EV) driver habits, predict electrochemical cell degradation risk, and provide actionable counterfactual optimization to extend battery pack lifespan.
 
