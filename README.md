@@ -1,8 +1,8 @@
-VoltIQ Telemetry ⚡
+# VoltIQ Telemetry ⚡
 Predictive EV Battery Degradation & Telemetry Intelligence
 VoltIQ is a machine-learning-powered battery telemetry simulator designed to analyze electric vehicle (EV) driver habits, predict electrochemical cell degradation risk, and provide actionable counterfactual optimization to extend battery pack lifespan.
 
-Key Features
+## Key Features
 Interactive Behavioral Telemetry Controls: 5 actionable driver inputs (Depth of Discharge, Target State of Charge, DC Fast Charge Share, Hard Braking Intensity, and Cruising Speed) equipped with an adaptive risk heatmap that dynamically alters track and thumb glows based on stress thresholds.
 
 LightGBM Inference Engine: Sub-15ms electrochemical stress and failure risk index computation served via a high-performance FastAPI asynchronous backend.
