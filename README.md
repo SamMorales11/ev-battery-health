@@ -12,3 +12,43 @@ VoltIQ is a machine-learning-powered battery telemetry simulator designed to ana
 - Behavior Presets: Instant scenario switching between Eco-Safe, Commuter, and Abusive driving profiles.
 
 ## System Architecture
+```bash
+┌────────────────────────────────────────────────────────┐
+│             Nuxt 3 Client (Vue 3 + Tailwind)           │
+│  - HabitControls (Adaptive Range Sliders)              │
+│  - RiskGauge (Animated Number Ticker + Lifespan)       │
+│  - OptimizationResult (Native SVG Radar Chart)         │
+│  - BatterySpecs (Dynamic Thermal & Power Bento Grid)   │
+└───────────────────────────▲────────────────────────────┘
+                            │ JSON over HTTP (REST API)
+┌───────────────────────────▼────────────────────────────┐
+│               FastAPI ML Inference Service             │
+│  - /api/predict   -> LightGBM Risk Scoring Model       │
+│  - /api/optimize  -> Coordinate Search Optimization    │
+└────────────────────────────────────────────────────────┘
+```
+
+## Project Structure
+```bash
+ev-battery-health/
+├── service-ml/
+│   ├── main.py                  # FastAPI server & inference endpoints
+│   ├── model.joblib             # Trained LightGBM battery risk model
+│   ├── requirements.txt         # Python dependencies
+│   └── README.md
+│
+├── web-nuxt/
+│   ├── app/
+│   │   ├── components/
+│   │   │   ├── BatterySpecs.vue         # Hardware specs & thermal telemetry
+│   │   │   ├── DashboardHeader.vue      # Branding, presets & optimize trigger
+│   │   │   ├── HabitControls.vue        # 5-slider adaptive heatmap controls
+│   │   │   ├── OptimizationResult.vue   # Counterfactual results & radar chart
+│   │   │   └── RiskGauge.vue            # Risk index, ticker & lifespan projection
+│   │   └── app.vue                      # Orchestrator & state management
+│   ├── nuxt.config.ts           # Nuxt configuration & runtime env
+│   ├── package.json             # Frontend dependencies
+│   └── tailwind.config.ts       # Design tokens & color palettes
+│
+└── README.md
+```
