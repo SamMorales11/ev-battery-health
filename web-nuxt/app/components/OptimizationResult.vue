@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import { Sparkles, CheckCircle2, ArrowDownRight, ArrowUpRight, Radio } from 'lucide-vue-next'
+import { Sparkles, CheckCircle2, ArrowDownRight, ArrowUpRight, Radio, Hourglass } from 'lucide-vue-next'
 
 const props = defineProps({
   optimization: {
@@ -18,6 +18,14 @@ const props = defineProps({
 })
 
 defineEmits(['apply'])
+
+// Komputasi Tambahan Tahun Masa Pakai Baterai
+const lifespanGainedYears = computed(() => {
+  if (!props.optimization) return '0.0'
+  const reduced = props.optimization.risk_reduced_percent ?? 0
+  const gain = (reduced / 100) * 7.2
+  return gain.toFixed(1)
+})
 
 // Komputasi Titik Poligon Radar Chart (Current Profile vs Recommended Profile)
 const radarData = computed(() => {
@@ -110,18 +118,29 @@ const radarData = computed(() => {
         </span>
       </div>
 
-      <!-- Metric Difference Banner -->
-      <div class="grid grid-cols-2 gap-3 p-3.5 rounded-2xl bg-slate-950/60 border border-white/5 box-border">
+      <!-- Metric Difference Banner with Lifespan Extension -->
+      <div class="grid grid-cols-3 gap-2.5 p-3.5 rounded-2xl bg-slate-950/60 border border-white/5 box-border">
         <div>
           <p class="text-[10px] text-slate-400 uppercase font-medium">Potensi Reduksi</p>
-          <p class="text-xl font-bold font-mono text-emerald-400">
+          <p class="text-lg sm:text-xl font-bold font-mono text-emerald-400">
             -{{ optimization.risk_reduced_percent }}%
           </p>
         </div>
-        <div class="text-right border-l border-white/5 pl-3">
-          <p class="text-[10px] text-slate-400 uppercase font-medium">Proyeksi Risiko Baru</p>
-          <p class="text-xl font-bold font-mono text-cyan-300">
+
+        <div class="border-l border-white/5 pl-2.5">
+          <p class="text-[10px] text-slate-400 uppercase font-medium">Risiko Baru</p>
+          <p class="text-lg sm:text-xl font-bold font-mono text-cyan-300">
             {{ (optimization.optimized_risk * 100).toFixed(2) }}%
+          </p>
+        </div>
+
+        <div class="border-l border-white/5 pl-2.5">
+          <div class="flex items-center gap-1">
+            <Hourglass class="w-3 h-3 text-emerald-400" />
+            <p class="text-[10px] text-slate-400 uppercase font-medium">Ekstensi Usia</p>
+          </div>
+          <p class="text-lg sm:text-xl font-bold font-mono text-emerald-300">
+            +{{ lifespanGainedYears }} <span class="text-xs font-sans text-slate-400">Thn</span>
           </p>
         </div>
       </div>

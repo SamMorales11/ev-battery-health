@@ -174,7 +174,7 @@ onMounted(() => {
     <!-- Main Container Full Screen -->
     <div class="relative z-10 w-full min-h-screen px-4 sm:px-6 lg:px-10 py-6 flex flex-col justify-between space-y-6 box-border max-w-[1600px] mx-auto">
       
-      <!-- Top Navigation Bar Component -->
+      <!-- 1. Header Bar Component -->
       <DashboardHeader 
         :active-preset="activePreset"
         :is-optimizing="isOptimizing"
@@ -182,10 +182,10 @@ onMounted(() => {
         @optimize="runOptimization"
       />
 
-      <!-- Main Dashboard Bento Grid -->
+      <!-- 2. Main Dashboard Bento Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start flex-1 box-border w-full">
         
-        <!-- Left Column: Sliders + Battery Hardware Bento Specs (7 Cols) -->
+        <!-- Kolom Kiri: Sliders + Battery Hardware Bento Specs (7 Cols) -->
         <div class="lg:col-span-7 space-y-6 box-border">
           <HabitControls 
             :form="form" 
@@ -193,16 +193,16 @@ onMounted(() => {
             @change="onSliderChange"
           />
 
-          <!-- Bento Balancing Card -->
           <BatterySpecs 
-          :form="form" 
-          :risk-data="riskData"
+            :form="form" 
+            :risk-data="riskData" 
           />
         </div>
 
-        <!-- Right Column: Gauge + Optimization & Radar (5 Cols) -->
+        <!-- Kolom Kanan: Gauge Risiko (dengan Proyeksi Dinamis) + Output Optimasi/Radar (5 Cols) -->
         <div class="lg:col-span-5 space-y-6 box-border">
           <RiskGauge 
+            :form="form"
             :risk-data="riskData" 
             :risk-theme="riskTheme" 
           />
