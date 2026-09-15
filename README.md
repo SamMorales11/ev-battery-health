@@ -67,3 +67,102 @@ ev-battery-health/
 - Cycle Aging (DoD & SoC Stress): Elevated average State of Charge (SoC > 80%) promotes electrolyte oxidation and transition metal dissolution, while deep Depth of Discharge (DoD > 80%) accelerates mechanical stress on anode particles.
 - Kinetic & Thermal Degradation (Fast Charge & Cruising Speed): High DC fast charge ratios (> 0.50) induce localized lithium plating during high-rate intercalation, driving irreversible cell capacity loss.
 - Regenerative Current Surges (Hard Braking): Severe deceleration events generate sudden, high-C-rate regenerative current spikes into the BMS.
+
+## ⚡ Quick Start & Local Setup 
+Prerequisites
+- Node.js: v18.x or higher
+- Python: v3.10 or higher
+- Package Managers: npm / pnpm & pip
+
+## 1. Backend Service (service-ml)
+```bash
+# Navigate to the backend directory
+cd service-ml
+
+# Create and activate a virtual environment
+python -m venv .venv
+# On Windows:
+.venv\Scripts\activate
+# On Linux/macOS:
+source .venv/bin/activate
+
+# Install required packages
+pip install -r requirements.txt
+
+# Start the FastAPI development server
+uvicorn main:app --reload --host 127.0.0.1 --port 8000
+```
+- The ML service will be accessible at http://127.0.0.1:8000.
+- Interactive API docs are available at http://127.0.0.1:8000/docs.
+
+## 2. Frontend Client (web-nuxt)
+```bash
+# Navigate to the frontend directory
+cd web-nuxt
+
+# Install dependencies
+npm install
+
+# Run the Nuxt development server
+npm run dev
+```
+- Open http://localhost:3000 in your browser.
+
+## 📡 API Specification
+1. Predict Risk Index
+- Endpoint: POST /api/predict
+- Description: Calculates failure probability based on operational parameters.
+Request Payload:
+```bash
+{
+  "depth_of_discharge": 70.0,
+  "state_of_charge": 90.0,
+  "fast_charge_ratio": 0.55,
+  "hard_braking_score": 65.0,
+  "average_speed": 85.0
+}
+```
+- Response:
+```bash
+{
+  "risk_percentage": 1.07,
+  "risk_level": "HEALTHY",
+  "confidence": 0.989
+}
+```
+
+2. Counterfactual Habit Optimization
+- Endpoint: POST /api/optimize
+- Description: Computes minimal feature deltas to achieve the lowest safe risk state.
+Response:
+```bash
+{
+  "optimized_risk": 0.0035,
+  "risk_reduced_percent": 67.2,
+  "latency_ms": 12,
+  "recommendations": [
+    {
+      "feature": "depth_of_discharge",
+      "current_value": 70,
+      "recommended_value": 30,
+      "delta": -40,
+      "action": "Turunkan 40.0"
+    },
+    {
+      "feature": "fast_charge_ratio",
+      "current_value": 0.55,
+      "recommended_value": 0.05,
+      "delta": -0.5,
+      "action": "Turunkan 0.5"
+    }
+  ]
+}
+```
+
+## 🧪 Environmental Variables
+```bash
+NUXT_PUBLIC_API_BASE_URL=[http://127.0.0.1:8000](http://127.0.0.1:8000)
+```
+
+## 📄 License
+Distributed under the MIT License. See LICENSE for more information.
