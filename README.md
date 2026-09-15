@@ -10,3 +10,5 @@ VoltIQ is a machine-learning-powered battery telemetry simulator designed to ana
 - SVG Radar Parameter Comparison: Native responsive polygon radar chart comparing baseline driver telemetry against recommended parameters.
 - Reactive Bento Architecture Card: Simulates battery hardware telemetry including real-time thermal operating windows, dynamic energy consumption (kWh/100km), and Battery Management System (BMS) mitigation states.
 - Behavior Presets: Instant scenario switching between Eco-Safe, Commuter, and Abusive driving profiles.
+
+## System Architecture
