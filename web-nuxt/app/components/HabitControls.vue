@@ -1,7 +1,8 @@
 <script setup>
+import { computed } from 'vue'
 import { Gauge } from 'lucide-vue-next'
 
-defineProps({
+const props = defineProps({
   form: {
     type: Object,
     required: true
@@ -13,6 +14,63 @@ defineProps({
 })
 
 defineEmits(['change'])
+
+// Kalkulasi status dan warna risiko per parameter
+const getFeatureRiskMeta = (key, val) => {
+  let status = 'safe'
+
+  switch (key) {
+    case 'depth_of_discharge':
+      if (val > 80) status = 'danger'
+      else if (val > 65) status = 'warning'
+      break
+    case 'state_of_charge':
+      if (val > 90) status = 'danger'
+      else if (val > 80) status = 'warning'
+      break
+    case 'fast_charge_ratio':
+      if (val > 0.70) status = 'danger'
+      else if (val > 0.35) status = 'warning'
+      break
+    case 'hard_braking_score':
+      if (val > 70) status = 'danger'
+      else if (val > 40) status = 'warning'
+      break
+    case 'average_speed':
+      if (val > 95) status = 'danger'
+      else if (val > 70) status = 'warning'
+      break
+  }
+
+  const palettes = {
+    safe: {
+      color: '#10b981',
+      glow: 'rgba(16, 185, 129, 0.45)',
+      text: 'text-emerald-400',
+      badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+      border: 'border-white/5 hover:border-emerald-500/30',
+      label: 'Optimal'
+    },
+    warning: {
+      color: '#f59e0b',
+      glow: 'rgba(245, 158, 11, 0.45)',
+      text: 'text-amber-400',
+      badge: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+      border: 'border-amber-500/20 hover:border-amber-500/40',
+      label: 'Moderate'
+    },
+    danger: {
+      color: '#f43f5e',
+      glow: 'rgba(244, 63, 94, 0.55)',
+      text: 'text-rose-400',
+      badge: 'bg-rose-500/10 text-rose-400 border-rose-500/30',
+      border: 'border-rose-500/30 hover:border-rose-500/50',
+      label: 'High Stress'
+    }
+  }
+
+  return palettes[status]
+}
 </script>
 
 <template>
@@ -33,21 +91,30 @@ defineEmits(['change'])
       <div 
         v-for="s in sliders" 
         :key="s.key"
-        class="group p-4 rounded-2xl bg-slate-950/50 border border-white/5 hover:border-cyan-500/30 transition-all duration-300 space-y-3 box-border"
+        :class="[
+          'group p-4 rounded-2xl bg-slate-950/50 border transition-all duration-300 space-y-3 box-border',
+          getFeatureRiskMeta(s.key, form[s.key]).border
+        ]"
       >
         <div class="flex items-center justify-between text-xs">
-          <span class="text-sm font-semibold text-slate-100 group-hover:text-cyan-300 transition-colors">
-            {{ s.label }}
-          </span>
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-semibold text-slate-100 group-hover:text-white transition-colors">
+              {{ s.label }}
+            </span>
+            <span :class="['text-[10px] font-medium px-2 py-0.5 rounded-full border transition-colors', getFeatureRiskMeta(s.key, form[s.key]).badge]">
+              {{ getFeatureRiskMeta(s.key, form[s.key]).label }}
+            </span>
+          </div>
+
           <div class="flex items-baseline gap-1 font-mono shrink-0">
-            <span class="text-base font-bold text-white tracking-tight">
+            <span :class="['text-base font-bold tracking-tight transition-colors duration-200', getFeatureRiskMeta(s.key, form[s.key]).text]">
               {{ s.key === 'fast_charge_ratio' ? (form[s.key] * 100).toFixed(0) : form[s.key] }}
             </span>
             <span class="text-[11px] text-slate-400">{{ s.unit || (s.key === 'fast_charge_ratio' ? '%' : '') }}</span>
           </div>
         </div>
 
-        <!-- Range Slider -->
+        <!-- Range Slider Adaptif -->
         <div class="relative flex items-center">
           <input 
             type="range" 
@@ -56,7 +123,12 @@ defineEmits(['change'])
             :step="s.step"
             v-model.number="form[s.key]" 
             @input="$emit('change')"
-            class="custom-slider w-full h-2 rounded-lg appearance-none cursor-pointer focus:outline-none"
+            :style="{
+              '--slider-accent': getFeatureRiskMeta(s.key, form[s.key]).color,
+              '--slider-glow': getFeatureRiskMeta(s.key, form[s.key]).glow,
+              '--slider-fill': `${((form[s.key] - s.min) / (s.max - s.min)) * 100}%`
+            }"
+            class="adaptive-slider w-full h-2 rounded-lg appearance-none cursor-pointer focus:outline-none"
           />
         </div>
 
@@ -68,3 +140,55 @@ defineEmits(['change'])
 
   </div>
 </template>
+
+<style scoped>
+.adaptive-slider {
+  background: linear-gradient(
+    to right,
+    var(--slider-accent) 0%,
+    var(--slider-accent) var(--slider-fill),
+    #1e293b var(--slider-fill),
+    #1e293b 100%
+  );
+}
+
+.adaptive-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 9999px;
+}
+
+.adaptive-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--slider-accent);
+  cursor: pointer;
+  margin-top: -6px;
+  box-shadow: 0 0 14px var(--slider-glow);
+  transition: transform 0.15s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.adaptive-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.18);
+  box-shadow: 0 0 18px var(--slider-glow);
+}
+
+.adaptive-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 9999px;
+  background: transparent;
+}
+
+.adaptive-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--slider-accent);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 14px var(--slider-glow);
+  transition: transform 0.15s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+}
+</style>
