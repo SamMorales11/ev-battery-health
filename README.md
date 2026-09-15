@@ -54,3 +54,9 @@ ev-battery-health/
 │
 └── README.md
 ```
+
+## Machine Learning & Degradation Formulation
+- VoltIQ models battery capacity loss and stress acceleration driven by the primary mechanisms of lithium-ion (NMC 811) degradation:
+- Cycle Aging (DoD & SoC Stress): Elevated average State of Charge (SoC > 80%) promotes electrolyte oxidation and transition metal dissolution, while deep Depth of Discharge (DoD > 80%) accelerates mechanical stress on anode particles.
+- Kinetic & Thermal Degradation (Fast Charge & Cruising Speed): High DC fast charge ratios (> 0.50) induce localized lithium plating during high-rate intercalation, driving irreversible cell capacity loss.
+- Regenerative Current Surges (Hard Braking): Severe deceleration events generate sudden, high-C-rate regenerative current spikes into the BMS.
