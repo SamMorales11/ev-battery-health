@@ -1,3 +1,5 @@
+<img width="736" height="414" alt="Chasing Black Mass_ Inside the Electric Vehicle Battery Recycling Process" src="https://github.com/user-attachments/assets/0c9e9cb9-4b2b-48d0-96fc-09cfc212b294" />
+
 # VoltIQ Telemetry ⚡
 Predictive EV Battery Degradation & Telemetry Intelligence
 VoltIQ is a machine-learning-powered battery telemetry simulator designed to analyze electric vehicle (EV) driver habits, predict electrochemical cell degradation risk, and provide actionable counterfactual optimization to extend battery pack lifespan.
