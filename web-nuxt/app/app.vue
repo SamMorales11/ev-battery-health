@@ -25,8 +25,10 @@ useHead({
   }
 })
 
+// Konfigurasi dinamis: di lokal mengarah ke FastAPI 127.0.0.1:8000, di Vercel menggunakan path relatif ""
 const config = useRuntimeConfig()
-const apiBase = config.public.apiBaseUrl || 'http://127.0.0.1:8000'
+const isDev = import.meta.dev || (typeof process !== 'undefined' && process.dev)
+const apiBase = isDev ? (config.public?.apiBaseUrl || 'http://127.0.0.1:8000') : ''
 
 const form = reactive({
   depth_of_discharge: 70,

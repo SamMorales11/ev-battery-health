@@ -5,12 +5,24 @@ import joblib
 import numpy as np
 import pandas as pd
 
-# Load model dan metadata dari folder models/
+# 1. Resolusi path absolut direktori tempat script ini berada
 BASE_DIR = Path(__file__).resolve().parent
-MODEL_PATH = BASE_DIR / "models" / "ev_battery_ops_model.joblib"
-METADATA_PATH = BASE_DIR / "models" / "model_metadata.json"
 
-with open(METADATA_PATH, "r") as f:
+# 2. Deteksi otomatis folder penampung bobot ("models" atau "model")
+MODELS_DIR = BASE_DIR / "models" if (BASE_DIR / "models").exists() else BASE_DIR / "model"
+
+MODEL_PATH = MODELS_DIR / "ev_battery_ops_model.joblib"
+METADATA_PATH = MODELS_DIR / "model_metadata.json"
+
+# 3. Validasi keberadaan file untuk memastikan file ikut ter-upload di Vercel
+if not METADATA_PATH.exists():
+    raise FileNotFoundError(f"File metadata model tidak ditemukan di: {METADATA_PATH}")
+
+if not MODEL_PATH.exists():
+    raise FileNotFoundError(f"File bobot model LightGBM tidak ditemukan di: {MODEL_PATH}")
+
+# 4. Load metadata dan model ke memori
+with open(METADATA_PATH, "r", encoding="utf-8") as f:
     METADATA = json.load(f)
 
 MODEL = joblib.load(MODEL_PATH)
