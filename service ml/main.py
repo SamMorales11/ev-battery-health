@@ -9,12 +9,12 @@ from optimizer import (
 )
 
 app = FastAPI(
-    title="EV Battery Health Simulator API",
+    title="VoltIQ - EV Battery Health Simulator API",
     description="Microservice ML untuk prediksi kegagalan baterai EV dan optimasi kebiasaan pengemudi.",
     version="1.0.0"
 )
 
-# Izinkan request dari Nuxt frontend (default Nuxt: localhost:3000)
+# Konfigurasi CORS: Mengizinkan akses dari domain lokal maupun domain Vercel publik
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -46,6 +46,16 @@ class TelemetryPayload(BaseModel):
         if self.additional_features:
             data.update(self.additional_features)
         return data
+
+
+@app.get("/")
+def root():
+    """Endpoint utama untuk verifikasi status server di Render."""
+    return {
+        "status": "online",
+        "service": "VoltIQ Predictive ML Engine",
+        "docs_url": "/docs"
+    }
 
 
 @app.get("/health")
